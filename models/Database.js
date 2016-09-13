@@ -1,6 +1,13 @@
-var Sequelize = require('sequelize');
-var sequelize = require('../config/db.js');
+var neo4j = require('neo4j');
 
+var db = new neo4j.GraphDatabase({
+    url: process.env.db, //db environment var should be http://localhost:7474 if running local
+        auth: process.env.dbAuth,     // dbAuth = {username password}
+        headers: {},    // optional defaults, e.g. User-Agent
+        proxy: null,    // optional URL
+        agent: null,    // optional http.Agent instance, for custom socket pooling
+});
+/*
 // Define the model that corresponds to the entry table in the database.
 var User = sequelize.define('user', {
   username: {type: Sequelize.STRING, unique: true },
@@ -67,7 +74,7 @@ User.sync();
 Entry.sync();
 Relationships.sync();
 Request.sync()
-
+*/
 module.exports.User = User;
 
 module.exports.Entry = Entry;

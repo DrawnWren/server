@@ -4,6 +4,7 @@ var jwt = require('jwt-simple');
 module.exports = {
 
   createUser : function(req, res, next){
+  /*
     db.User.create(req.body)
       .then(function(newUser){
         var token = jwt.encode(newUser, 'secret');
@@ -14,6 +15,7 @@ module.exports = {
       .catch(function(err){
         res.status(404).json(err)
       })
+  */
   },
 
   findUser: function(req, res, next){
@@ -21,16 +23,10 @@ module.exports = {
     if (!username) {
       return res.status(200).json([]);
     }
-    db.User.findAll({ 
-      attributes: ['id', 'username', 'fullname'],
-      where: {username: { $iLike: '%' + username + '%' }}
-    })
-      .then(function(result){
-        res.status(200).json(result);
-      })
-      .catch(function(err){
-        res.status(404).json(err)
-      })
+   query = `MATCH (user {username: ${username}})`;
+   db.cp({query, cb}).then( d => {
+       res.json(d);
+   }).catch( e => next(e) ); 
   },
 
   signIn: function(req, res, next) {

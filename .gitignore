@@ -1,3 +1,7 @@
 node_modules/
 
 config/db.js
+
+## Swap Files ##
+*.sw*
+*~
