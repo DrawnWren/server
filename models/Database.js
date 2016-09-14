@@ -1,5 +1,7 @@
 var neo4j = require('neo4j');
 
+var Promise = require('bluebird');
+
 var db = new neo4j.GraphDatabase({
     url: process.env.db, //db environment var should be http://localhost:7474 if running local
         auth: process.env.dbAuth,     // dbAuth = {username password}
@@ -7,6 +9,23 @@ var db = new neo4j.GraphDatabase({
         proxy: null,    // optional URL
         agent: null,    // optional http.Agent instance, for custom socket pooling
 });
+
+// Promisified cypher. Because CBs suck
+db.cp = function (query) {
+    return new Promise((fulfill, reject) => {
+        db.cypher(query, function(err, res) {
+            if (err) reject(err)
+            else fulfill(res);
+        });
+    });
+} 
+
+db.findByUsername = function(username) { 
+    query = `MATCH (user {username: ${username}})`;
+    return db.cp(query);
+}
+
+module.exports = db;
 /*
 // Define the model that corresponds to the entry table in the database.
 var User = sequelize.define('user', {
@@ -75,8 +94,3 @@ Entry.sync();
 Relationships.sync();
 Request.sync()
 */
-module.exports.User = User;
-
-module.exports.Entry = Entry;
-module.exports.Relationships = Relationships;
-module.exports.Request = Request;

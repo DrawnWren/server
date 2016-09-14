@@ -1,4 +1,4 @@
-var db = require('../models/Database.js');
+var db = require('../models/Database');
 var jwt = require('jwt-simple');
 
 module.exports = {
@@ -21,8 +21,7 @@ module.exports = {
     if (!username) {
       return res.status(200).json([]);
     }
-   query = `MATCH (user {username: ${username}})`;
-   db.cp(query).then( d => {
+   db.findByUsername(username).then( d => {
        res.json(d);
    }).catch( e => next(e) ); 
   },
@@ -30,7 +29,9 @@ module.exports = {
   signIn: function(req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
-    db.User.findOne({ where: {username: username}} )
+    let query = ``;
+
+    db.findByUsername(username)
      .then(function (user) {
         if (!user) {
           res.status(404).json({ error: 'User does not exist' })
