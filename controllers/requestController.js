@@ -2,19 +2,15 @@ var db = require('../models/Database.js');
 
 module.exports = {
   sendRequest: function(req, res, next) {
-    var newRequest = {
-      userId: req.user.id,
-      requestReceiver: req.body.requestReceiver,
-      status: 'CREATED'
-    }
-    db.Request.create(newRequest)
+   let query = `MATCH (a:User), (b:User) WHERE a.uuid = ${req.user.id} AND b.uuid = ${req.body.requestReceiver}`;
+    query = `${query} CREATE (a)-[r:wantsFriend]->(b)`;
+    db.cp(query)
       .then(function(){
           res.status(201).send("Success");
       })
       .catch(function(err){
         res.status(404).json(err)
       });
-
   },
 
   getRequests: function(req, res, next) {
@@ -26,7 +22,7 @@ module.exports = {
         attributes: ['fullname']
       }
     }) */
-    
+    let query = `MATCH (a)-[r:wantsFriend]->(b) WHERE b.uuid = ${req.user.id} RETURN (r)`; 
     db.cp(query);
       .then(function(requestList) {
         res.status(200).json(requestList);
@@ -37,50 +33,33 @@ module.exports = {
   },
 
   acceptRequest: function(req, res, next) {
-    db.Request.findOne({ where: req.body.requestId })
-      .then(function(result) {
-        if (result) {
-          if (result.requestReceiver === req.user.id) {
-            return result.update({ status: 'ACCEPTED'})
-              .then(function() {
-                // create entries in friends table
-                db.Relationships.bulkCreate([
-                    { user1: result.userId, user2: result.requestReceiver },
-                    { user1: result.requestReceiver, user2: result.userId }
-                  ])
-                  .then(function(){
-                    res.status(201).send("Success");
-                  })
-                  .catch(function(err){
-                    res.status(404).json(err)
-                  })
-              })
-              .catch(function(err) {
-                res.status(404).json(err);
-              })
-          } else {
-            return res.status(404).json({ error: 'You are not receiver of this request'});
-          }
-        }
-        res.status(404).json({ error: 'Request not found'});
+    // find a request with requestId and user ids
+    let query = `MATCH (a:User)-[r:wantsFriend]->(b:User)`;
+    query = `${query} WHERE b.uuid = ${req.user.id}`; 
+    query = `${query} AND r.uuid = ${req.body.requestId}`;
+    // remove the wantsFriend relationship 
+    query = `${query} DELETE (r)`;
+    // then create a two way friendship
+    query = `${query} CREATE (a)-[r:hasFriend]->(b)`;
+    query = `${query} (b)-[r:hasFriend]->(a)`;
+    db.cp(query)
+      .then(function(){
+          res.status(201).send("Success");
       })
-      .catch(function(err) {
-        res.status(404).json(err);
-      })
+      .catch(function(err){
+           res.status(404).json(err)
+      });
   }, 
 
   rejectRequest: function(req, res, next) {
-    db.Request.findOne({ where: req.body.requestId })
-      .then(function(result){
-        result.destroy()
-          .on('success', function(u){
-            if (u && u.deletedAt) {
+    // find a request with requestId and user ids
+    let query = `MATCH (a:User)-[r:wantsFriend]->(b:User)`;
+    query = `${query} WHERE r.uuid = ${req.body.requestId}`; 
+    // delete it
+    query = `${query} DELETE (r)`;
+    db.cp(query)
+      .then(function(){
               res.status(201).send("Success");
-            } 
-          })
-          .on('error', function(err){
-            res.status(500).json({ error: "There was an error deleting this request from the database. Error message: " + err});
-          });
       })
       .catch(function(err){
         res.status(404).json({ error: "The request was not found in the database. Error message: " + err });
