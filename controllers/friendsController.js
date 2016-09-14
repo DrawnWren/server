@@ -3,6 +3,7 @@ var db = require('../models/Database.js');
 module.exports = {
 
   fetchFriends: function(req, res, next){
+
     db.Relationships.findAll({ where: {user1: req.user.id }})
       .then(function(friends){
         var query = friends.reduce(function(total,friend){
@@ -30,12 +31,12 @@ module.exports = {
   },
 
   acceptFriendReq: function(req, res, next){
-    var rev = {
+    var reverse = {
       user1: req.body.user2,
       user2: req.body.user1
     }
 
-    var query = [req.body,rev]
+    var query = [req.body,reverse]
 
     db.Relationships.bulkCreate(query)
       .then(function(){

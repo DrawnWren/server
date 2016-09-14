@@ -18,13 +18,16 @@ module.exports = {
   },
 
   getRequests: function(req, res, next) {
+      /*
     db.Request.findAll({
       where: { requestReceiver: req.user.id, status: 'CREATED' },
       include: {
         model: db.User,
         attributes: ['fullname']
       }
-    })
+    }) */
+    
+    db.cp(query);
       .then(function(requestList) {
         res.status(200).json(requestList);
       })
