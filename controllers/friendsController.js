@@ -17,7 +17,8 @@ module.exports = {
       })
   },
 
-  acceptFriendReq: function(req, res, next){
+/*  Shouldn't be in use 
+ *  acceptFriendReq: function(req, res, next){
     var reverse = {
       user1: req.body.user2,
       user2: req.body.user1
@@ -36,4 +37,5 @@ module.exports = {
         res.status(404).json(err)
       })
   },
+*/
 }

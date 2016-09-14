@@ -18,7 +18,8 @@ module.exports = function(app, express) {
 
   app.use('/api/friends', utils.decode);
   app.get('/api/friends', friendsController.fetchFriends);
-  app.post('/api/friends', friendsController.acceptFriendReq);
+   // According to the dev team, this was a development only endpoint
+   // app.post('/api/friends', friendsController.acceptFriendReq);
 
   app.use('/api/friendreq', utils.decode);
   app.post('/api/friendreq', function(req, res, next) {
