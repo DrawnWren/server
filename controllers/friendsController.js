@@ -1,29 +1,16 @@
-var db = require('../models/Database.js');
+var db = require('../models/Database');
 
 module.exports = {
 
   fetchFriends: function(req, res, next){
-
-    db.Relationships.findAll({ where: {user1: req.user.id }})
-      .then(function(friends){
-        var query = friends.reduce(function(total,friend){
-          total.push(friend.dataValues.user2)
-          return total;
-        },[])
-        db.User.findAll({
-          attributes: ['id', 'username', 'fullname'],
-          where: {
-              id: {
-                $any: query
-              }
-          }
-        })
-          .then(function(friendList){
-            res.status(201).json(friendList)
-          })
-          .catch(function(err){
-            res.status(404).json(err)
-          })
+    // Find all friends and return 
+    // an array of User objects
+    let query = `MATCH (a:User)-[r:hasFriend]->(b:User)`;
+    query = `${query} WHERE a.uuid = req.user.id`;
+    query = `${query} RETURN (b)`;
+    db.cp(query)
+     .then(function(friendList){
+        res.status(201).json(friendList)
       })
       .catch(function(err){
         res.status(404).json(err)
