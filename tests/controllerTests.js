@@ -71,3 +71,45 @@ describe('/api/users ', function() {
     }); 
 
 });
+
+describe('/api/friendreq ', function() {
+
+    it('shoudl respond to a GET request with an array of all inbound friend requests', function(done) {
+        /*[
+          {
+                id: [integer],
+            requestReceiver: [integer],
+            createdAt: [timestamp],
+            updatedAt: [timestamp],
+            userId: [integer],
+            user: {
+              fullname: [string]
+            }
+          }
+        ]
+         */
+    });
+
+    it('should respond to a POST request with a 201 status code.', function(done) {
+        /*fetch('http://localhost:3000/api/friendreq', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-access-token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTAsInVzZXJuYW1lIjoidGVzdDUiLCJwYXNzd29yZCI6InBhc3MiLCJmdWxsbmFtZSI6ImhlbGxvIiwiY3JlYXRlZEF0IjoiMjAxNi0wOS0wNFQyMzo0MToyNS41NDJaIiwidXBkYXRlZEF0IjoiMjAxNi0wOS0wNFQyMzo0MToyNS41NDJaIn0.yjfFIaKJJxHzp5UPegVwzL9rMWXsALgLTo3emwJV0-w'
+    },
+    body: {
+      requestReceiver: 25,
+    }
+  })
+         */
+    });
+
+    it('should respond to a DELETE request with a 201 status code.', function(done) {
+    });
+
+    it('should properly delete a friend request.', function(done) {
+    });
+
+    it('should properly accept a friend request.', function(done) {
+    });
+});
