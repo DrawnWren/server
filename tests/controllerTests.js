@@ -6,6 +6,17 @@ let users = require('../controllers/userController');
 describe('/api/entries ', function() {
 
     it('should respond to GET requests with an array of Entry objects.', function(done) {
+        /*[
+          { 
+            id: [integer],
+            userId: [integer],
+            text: [string],
+            location: [string],
+            createdAt: [timestamp],
+            updatedAt: [timestamp] 
+          }
+        ]
+         */
 
     });
 
@@ -33,3 +44,30 @@ describe('/api/entries ', function() {
     });
 });
 
+describe('/api/friends ', function() {
+    it('should respond to a GET request with and array of user objects.', function(done) {
+        /*[
+          { 
+            id: [integer],
+            username: [string],
+            fullname: [string],
+          }
+        ]
+         */
+
+    });
+});
+
+describe('/api/users ', function() {
+    it('should respond to a GET request with an array of user objects that match the username param.', function(done) {
+        /*[
+              { 
+                id: [integer],
+                username: [string],
+                fullname: [string],
+              }
+            ]
+         */
+    }); 
+
+});
