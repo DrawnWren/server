@@ -5,11 +5,12 @@ module.exports = {
   createEntry: function(req, res, next){
 
     // find the user with id = req.user.id
-    let query = `MATCH (a:User) WHERE a.uuid = ${req.user.id}`; 
+    let query = `MATCH (a:User) WHERE a.uuid = '${req.user.id}'`; 
     // create an entry with the params from body (location and text)
     query = `CREATE (e:Entry ${req.body})`; 
     // create a Posted relationship between User and Entry
     query = `, (a)-[r:Posted]->(e)`;
+    query = `RETURN (e)`;
 
     db.cp(query)
       .then(function() {

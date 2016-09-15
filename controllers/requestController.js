@@ -2,8 +2,9 @@ var db = require('../models/Database.js');
 
 module.exports = {
   sendRequest: function(req, res, next) {
-   let query = `MATCH (a:User), (b:User) WHERE a.uuid = ${req.user.id} AND b.uuid = ${req.body.requestReceiver}`;
+   let query = `MATCH (a:User), (b:User) WHERE a.uuid = '${req.user.id}' AND b.uuid = '${req.body.requestReceiver}'`;
     query = `${query} CREATE (a)-[r:wantsFriend]->(b)`;
+    query = `${query} RETURN (r)`;
     db.cp(query)
       .then(function(){
           res.status(201).send("Success");
@@ -22,8 +23,8 @@ module.exports = {
         attributes: ['fullname']
       }
     }) */
-    let query = `MATCH (a)-[r:wantsFriend]->(b) WHERE b.uuid = ${req.user.id} RETURN (r)`; 
-    db.cp(query);
+    let query = `MATCH (a)-[r:wantsFriend]->(b) WHERE b.uuid = '${req.user.id}' RETURN (r)`; 
+    db.cp(query)
       .then(function(requestList) {
         res.status(200).json(requestList);
       })
@@ -35,13 +36,14 @@ module.exports = {
   acceptRequest: function(req, res, next) {
     // find a request with requestId and user ids
     let query = `MATCH (a:User)-[r:wantsFriend]->(b:User)`;
-    query = `${query} WHERE b.uuid = ${req.user.id}`; 
-    query = `${query} AND r.uuid = ${req.body.requestId}`;
+    query = `${query} WHERE b.uuid = '${req.user.id}'`; 
+    query = `${query} AND r.uuid = '${req.body.requestId}'`;
     // remove the wantsFriend relationship 
     query = `${query} DELETE (r)`;
     // then create a two way friendship
     query = `${query} CREATE (a)-[r:hasFriend]->(b)`;
-    query = `${query} (b)-[r:hasFriend]->(a)`;
+    query = `${query} (b)-[y:hasFriend]->(a)`;
+    query = `${query} RETURN (r)`;
     db.cp(query)
       .then(function(){
           res.status(201).send("Success");
@@ -54,7 +56,7 @@ module.exports = {
   rejectRequest: function(req, res, next) {
     // find a request with requestId and user ids
     let query = `MATCH (a:User)-[r:wantsFriend]->(b:User)`;
-    query = `${query} WHERE r.uuid = ${req.body.requestId}`; 
+    query = `${query} WHERE r.uuid = '${req.body.requestId}'`; 
     // delete it
     query = `${query} DELETE (r)`;
     db.cp(query)

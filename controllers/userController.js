@@ -6,7 +6,8 @@ module.exports = {
   createUser : function(req, res, next){
     // I expect req.body to turn into '{username: $username, password:
     // $password, fullname: $fullname }
-    query = `CREATE (n:User ${req.body})`;
+    query = `CREATE (n:User {username: '${req.body.username}',`;
+    query = `${query}  password: '${req.body.password}', fullname: '${req.body.fullname}'})`;
     db.cp(query).then( newUser => {
         var token = jwt.encode(newUser, 'secret');
         res.status(201).json({
@@ -22,6 +23,7 @@ module.exports = {
       return res.status(200).json([]);
     }
    db.findByUsername(username).then( d => {
+       d = d[0].a;
        res.json(d);
    }).catch( e => next(e) ); 
   },
@@ -36,7 +38,10 @@ module.exports = {
         if (!user) {
           res.status(404).json({ error: 'User does not exist' })
         } else {
-            if (password === user.password){
+            //Neo4j library returns an array of results, keyed by the variable
+            //name in query
+            user = user[0].a;
+            if (password === user.properties.password){
               var token = jwt.encode(user, 'secret');
               res.json({token: token});
             } else {

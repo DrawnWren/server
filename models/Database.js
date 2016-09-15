@@ -2,12 +2,11 @@ var neo4j = require('neo4j');
 
 var Promise = require('bluebird');
 
+console.log(`DB URI is ${process.env.db}`);
+
 var db = new neo4j.GraphDatabase({
     url: process.env.db, //db environment var should be http://localhost:7474 if running local
-        auth: process.env.dbAuth,     // dbAuth = {username password}
         headers: {},    // optional defaults, e.g. User-Agent
-        proxy: null,    // optional URL
-        agent: null,    // optional http.Agent instance, for custom socket pooling
 });
 
 // Promisified cypher. Because CBs suck
@@ -21,7 +20,8 @@ db.cp = function (query) {
 } 
 
 db.findByUsername = function(username) { 
-    query = `MATCH (user {username: ${username}})`;
+    let query = `MATCH (a:User {username: '${username}'})`;
+    query = `${query} RETURN (a)`;
     return db.cp(query);
 }
 

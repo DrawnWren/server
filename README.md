@@ -2,6 +2,7 @@
 
 **Table of Contents** 
 
+- [**Set Up**](#set-up)
 - [**Log In**](#log-in)
 - [**Sign Up**](#sign-up)
 - [**Fetch Entries**](#fetch-entries)
@@ -12,6 +13,14 @@
 - [**Get Friend Requests**](#get-friend-requests)
 - [**Accept Friend Request**](#accept-friend-request)
 - [**Reject Friend Request**](#reject-friend-request)
+
+**Set Up**
+----
+ Basic set up.
+* **Environment Variables**
+  
+  db = Neo4J URL
+  dbAuth = {username password} for Neo4J
 
 **Log In**
 ----
