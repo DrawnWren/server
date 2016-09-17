@@ -5,14 +5,16 @@ module.exports = {
   fetchFriends: function(req, res, next){
     // Find all friends and return 
     // an array of User objects
+    const userId = req.user.properties ? req.user.properties.uuid : null;
     let query = `MATCH (a:User)-[r:hasFriend]->(b:User)`;
-    query = `${query} WHERE a.uuid = req.user.id`;
-    query = `${query} RETURN (b)`;
+    query = `${query} WHERE a.uuid = '${req.user.properties.uuid}'`;
+    query = `${query} RETURN b`;
     db.cp(query)
      .then(function(friendList){
         res.status(201).json(friendList)
       })
       .catch(function(err){
+        console.log('Failed to fetch friends, for uuid ', req.user.properties.uuid);
         res.status(404).json(err)
       })
   },

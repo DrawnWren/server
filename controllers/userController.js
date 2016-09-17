@@ -6,8 +6,9 @@ module.exports = {
   createUser : function(req, res, next){
     // I expect req.body to turn into '{username: $username, password:
     // $password, fullname: $fullname }
-    query = `CREATE (n:User {username: '${req.body.username}',`;
+    query = `CREATE (n:User { username: '${req.body.username}',`;
     query = `${query}  password: '${req.body.password}', fullname: '${req.body.fullname}'})`;
+    query = `${query} RETURN n`;
     db.cp(query).then( newUser => {
         var token = jwt.encode(newUser, 'secret');
         res.status(201).json({
@@ -23,15 +24,18 @@ module.exports = {
       return res.status(200).json([]);
     }
    db.findByUsername(username).then( d => {
-       d = d[0].a;
-       res.json(d);
+       // if there were no users found, send an empty array
+       d = d[0] ? d[0].a.properties : [];
+       d.id = d.uuid;
+       delete d.uuid;
+       delete d.password;
+       res.json([d]);
    }).catch( e => next(e) ); 
   },
 
   signIn: function(req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
-    let query = ``;
 
     db.findByUsername(username)
      .then(function (user) {
@@ -40,6 +44,7 @@ module.exports = {
         } else {
             //Neo4j library returns an array of results, keyed by the variable
             //name in query
+            console.log('Result of findByUsername : ', user);
             user = user[0].a;
             if (password === user.properties.password){
               var token = jwt.encode(user, 'secret');
@@ -50,6 +55,7 @@ module.exports = {
         }
       })
       .catch(function(err){
+          console.log('User signup error, ', err);
         res.json(err);
       })
   }

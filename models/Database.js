@@ -21,7 +21,7 @@ db.cp = function (query) {
 
 db.findByUsername = function(username) { 
     let query = `MATCH (a:User {username: '${username}'})`;
-    query = `${query} RETURN (a)`;
+    query = `${query} RETURN a`;
     return db.cp(query);
 }
 
