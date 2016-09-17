@@ -8,13 +8,14 @@ module.exports = {
     const userId = req.user.properties ? req.user.properties.uuid : null;
     let query = `MATCH (a:User)-[r:hasFriend]->(b:User)`;
     query = `${query} WHERE a.uuid = '${req.user.properties.uuid}'`;
-    query = `${query} RETURN b`;
+    query = `${query} RETURN b.uuid AS id, b.username AS username, b.fullname AS fullname`;
     db.cp(query)
      .then(function(friendList){
         res.status(201).json(friendList)
       })
       .catch(function(err){
         console.log('Failed to fetch friends, for uuid ', req.user.properties.uuid);
+        console.log(err);
         res.status(404).json(err)
       })
   },

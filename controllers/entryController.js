@@ -25,6 +25,7 @@ module.exports = {
   },
 
   getEntries: function(req, res, next) {
+    console.log('Get entry req.user is, ', req.user);
     let baseUserId = req.user.properties ? req.user.properties.uuid.toString() : null;
     let friendId = req.query.userID;
     // if this isn't a request for your own entries

@@ -23,23 +23,27 @@ module.exports = {
         attributes: ['fullname']
       }
     }) */
-    let query = `MATCH (a)-[r:wantsFriend]->(b) WHERE b.uuid = '${req.user.properties.uuid}' RETURN r.uuid, a.uuid, a.fullname, a.username`; 
+
+    console.log('Req is ,' , req.user);
+    let query = `MATCH (a)-[r:wantsFriend]->(b) WHERE b.uuid = '${req.user.properties.uuid}' RETURN r.uuid AS id, a.uuid AS userId, a.fullname, a.username`; 
     db.cp(query)
       .then((requestList) => {
         requestList = requestList.map((request) => {
-            return {
-                id: request.r.uuid,
-                receive: req.user.properties.uuid,
-                createdAt: Date.now(),
-                userId: request.a.uuid,
-                user: { fullname: request.a.fullname, username: request.a.username }
-            };
-        });
-
+            request.requestReceiver = req.user.properties.uuid;
+            request.user = { fullname: request['a.fullname'], username: request['a.username'] };
+            request.createdAt = Date.now();
+            request.updatedAt = Date.now();
+            
+            delete request['a.fullname'];
+            delete request['a.username'];
+            
+            return request;
+        }); 
         console.log('Requests list is , ', requestList);
         res.status(200).json(requestList);
       })
       .catch(function(err) {
+        console.log('Friend request error , ', err);
         res.status(404).json(err);
       });
   },
@@ -52,9 +56,10 @@ module.exports = {
     // remove the wantsFriend relationship 
     query = `${query} DELETE r`;
     // then create a two way friendship
-    query = `${query} CREATE (a)-[r:hasFriend]->(b)`;
+    query = `${query} CREATE (a)-[x:hasFriend]->(b), `;
     query = `${query} (b)-[y:hasFriend]->(a)`;
     query = `${query} RETURN r`;
+    console.log('Accept request query is ,', query);
     db.cp(query)
       .then(function(){
           res.status(201).send("Success");

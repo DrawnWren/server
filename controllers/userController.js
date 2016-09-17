@@ -9,12 +9,12 @@ module.exports = {
     query = `CREATE (n:User { username: '${req.body.username}',`;
     query = `${query}  password: '${req.body.password}', fullname: '${req.body.fullname}'})`;
     query = `${query} RETURN n`;
-    db.cp(query).then( newUser => {
-        var token = jwt.encode(newUser, 'secret');
-        res.status(201).json({
-            token: token
-        })
-    })
+    db.cp(query).then(() =>  db.findByUsername(req.body.username).then((newUser) => {
+            console.log('New user is, ', newUser);
+            var token = jwt.encode(newUser[0].a, 'secret');
+            res.status(201).json({token: token });
+        });
+    )
     .catch( e => next(e) );
   },
 
